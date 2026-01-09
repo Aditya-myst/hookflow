@@ -19,7 +19,8 @@ async def root():
     return {"status": "HookFlow API is Live", "version": "1.0.0"}
 
 # 2. Enable CORS (Restricted for Production)
-allowed_origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",")]
+# We strip whitespace and trailing slashes for robustness
+allowed_origins = [o.strip().rstrip("/") for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",")]
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,7 +32,8 @@ app.add_middleware(
 # 3. Initialize Clients
 supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel('gemini-2.5-flash')
+# Using gemini-1.5-flash as it is the most stable production model
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 from auth import VerifyToken
 from fastapi import Depends
