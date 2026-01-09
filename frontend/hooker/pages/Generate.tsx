@@ -82,7 +82,7 @@ export const Generate: React.FC = () => {
       } else if (error.message.includes("Quota Exceeded")) {
         alert("AI Service is currently busy. Please try again in 60 seconds.");
       } else {
-        alert("An unexpected error occurred. Please check your connection.");
+        alert(`Error: ${error.message}`);
       }
     } finally {
       setLoading(false);
