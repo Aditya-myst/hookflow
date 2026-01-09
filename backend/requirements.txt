@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+supabase
+python-dotenv
+google-generativeai
+pandas
+pyjwt
+requests
+svix
+cryptography
+gunicorn
