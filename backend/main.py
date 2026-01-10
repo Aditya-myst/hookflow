@@ -32,8 +32,8 @@ app.add_middleware(
 # 3. Initialize Clients
 supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-# Using gemini-1.5-flash as it is the most stable production model
-model = genai.GenerativeModel('gemini-1.5-flash')
+# Using gemini-flash-latest as it is compatible with the provided API key
+model = genai.GenerativeModel('gemini-flash-latest')
 
 from auth import VerifyToken
 from fastapi import Depends
