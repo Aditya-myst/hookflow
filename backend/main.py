@@ -174,16 +174,11 @@ async def generate_all(
             ]
             result = model.generate_content(prompt, safety_settings=safety_settings)
             
-            if not result.text:
-                print("DEBUG: AI returned EMPTY TEXT")
-                return {"error": "AI service returned empty response. Please try a different topic."}, 500
-                
-            print(f"DEBUG: AI RAW TEXT (FIRST 100) -> {result.text[:100]}...")
         except Exception as gemini_error:
             if "quota" in str(gemini_error).lower():
-                return {"error": "AI Service Quota Exceeded. Please try again in a minute."}, 429
+                raise HTTPException(status_code=429, detail="AI Service Quota Exceeded. Please try again in a minute.")
             print(f"Gemini Error: {gemini_error}")
-            return {"error": "AI Generation failed"}, 500
+            raise HTTPException(status_code=500, detail="AI Generation failed")
         
         # Robust JSON extraction
         try:
@@ -215,7 +210,7 @@ async def generate_all(
                      return [data]
                  
                  print(f"AI Output (Not JSON): {text}")
-                 return {"error": "AI response was not valid JSON", "raw": text}, 500
+                 raise HTTPException(status_code=500, detail="AI response was not valid JSON")
                  
         except Exception as parse_error:
             print(f"JSON Parse Error: {parse_error}")
@@ -390,7 +385,7 @@ async def get_dashboard_data(auth_result = Depends(VerifyToken())):
 
     except Exception as e:
         print(f"Dashboard Error: {e}")
-        return {"error": str(e)}, 500
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Note: Do not put 'app.run' here. Use the command below.
 
@@ -471,14 +466,12 @@ async def generate_captions(
                 {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
             ]
             result = model.generate_content(prompt, safety_settings=safety_settings)
-            if not result.text:
-                return {"error": "AI returned empty response"}, 500
         except Exception as gemini_error:
             # Check for quota
             if "quota" in str(gemini_error).lower():
-                return {"error": "AI Service Quota Exceeded. Please try again in a minute."}, 429
+                raise HTTPException(status_code=429, detail="AI Service Quota Exceeded. Please try again in a minute.")
             print(f"Captions Gemini Error: {gemini_error}")
-            return {"error": "AI Generation failed"}, 500
+            raise HTTPException(status_code=500, detail="AI Generation failed")
 
         # Robust JSON extraction
         try:
@@ -584,4 +577,4 @@ async def verify_payment(
 
     except Exception as e:
         print(f"Payment Error: {e}")
-        return {"error": str(e)}, 500
+        raise HTTPException(status_code=500, detail=str(e))

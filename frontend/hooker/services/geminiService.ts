@@ -31,13 +31,20 @@ export async function generateHooks(params: {
 
   if (!response.ok) {
     const errData = await response.json().catch(() => ({}));
+    console.error("Backend Error Data:", errData);
     if (response.status === 402) {
       throw new Error("INSUFFICIENT_CREDITS");
     }
-    throw new Error(errData.detail || errData.error || 'Failed to fetch hooks from backend');
+    const message = errData.detail || errData.error || response.statusText || 'Failed to fetch hooks from backend';
+    throw new Error(message);
   }
 
   const rawResults = await response.json();
+
+  if (!Array.isArray(rawResults)) {
+    console.error("Expected array from backend, got:", rawResults);
+    throw new Error("Invalid response format from AI service");
+  }
 
   return rawResults.map((item: any, index: number) => ({
     id: `${Date.now()}-${index}`,
